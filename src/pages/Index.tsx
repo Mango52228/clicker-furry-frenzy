@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  'YOUR_SUPABASE_URL',
-  'YOUR_SUPABASE_ANON_KEY'
-);
 
 const Index = () => {
   const [score, setScore] = useState(0);
@@ -14,7 +8,14 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Load saved data from localStorage on component mount
   useEffect(() => {
+    const savedScore = localStorage.getItem('hamsterScore');
+    const savedMultiplier = localStorage.getItem('hamsterMultiplier');
+    
+    if (savedScore) setScore(parseInt(savedScore));
+    if (savedMultiplier) setMultiplier(parseInt(savedMultiplier));
+
     // Check if device is mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (!isMobile) {
@@ -23,6 +24,12 @@ const Index = () => {
     }
     setIsLoading(false);
   }, [navigate]);
+
+  // Save data to localStorage whenever score or multiplier changes
+  useEffect(() => {
+    localStorage.setItem('hamsterScore', score.toString());
+    localStorage.setItem('hamsterMultiplier', multiplier.toString());
+  }, [score, multiplier]);
 
   const handleClick = () => {
     setScore(prev => prev + multiplier);
